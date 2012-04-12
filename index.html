@@ -1,0 +1,118 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>PHP Crontab Manager by MediovskiTechnology</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>PHP Crontab Manager</h1>
+        <p>php, crontab, jobs, console jobs, application crontab</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/MediovskiTechnology/php-crontab-manager" class="button fork"><strong>Fork On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/MediovskiTechnology/php-crontab-manager/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/MediovskiTechnology/php-crontab-manager/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>PHP Crontab Manager</h1>
+
+<p>Last build status: <a href="http://travis-ci.org/MediovskiTechnology/php-crontab-manager"><img src="https://secure.travis-ci.org/MediovskiTechnology/php-crontab-manager.png?branch=master" alt="Build Status"></a></p>
+
+<p>Manages crontab file by adding and deleting the appropriate entries. It is able
+to track the source file so that after the changes in this file to upgrade a 
+crontab file to the target.</p>
+
+<h2>Installation</h2>
+
+<ul>
+<li>copy files to your project</li>
+<li>include files from src directory or use some autoloader</li>
+<li>use it as described below</li>
+</ul><h2>Requirements</h2>
+
+<p>If you are willing to use this tool as other user be sure enable appropriate
+entry into end of suroers file (visudo) for ex.:</p>
+
+<pre><code>%developers ALL=(www-data)NOPASSWD:/usr/bin/crontab
+</code></pre>
+
+<p>Above meens that users in group <code>developers</code> can run program <code>crontab</code> as user
+<code>www-data</code> without password</p>
+
+<h2>Usage</h2>
+
+<p>Here is a simple example of use. Adding a simple task to crontab:</p>
+
+<div class="highlight">
+<pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">php\manager\crontab\CrontabManager</span><span class="p">;</span>
+
+<span class="nv">$crontab</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CrontabManager</span><span class="p">();</span>
+<span class="nv">$job</span> <span class="o">=</span> <span class="nv">$crontab</span><span class="o">-&gt;</span><span class="na">newJob</span><span class="p">();</span>
+<span class="nv">$job</span><span class="o">-&gt;</span><span class="na">on</span><span class="p">(</span><span class="s1">'* * * * *'</span><span class="p">);</span>
+<span class="nv">$job</span><span class="o">-&gt;</span><span class="na">onMinute</span><span class="p">(</span><span class="s1">'20-30'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">doJob</span><span class="p">(</span><span class="s2">"echo foo"</span><span class="p">);</span>
+<span class="nv">$crontab</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$job</span><span class="p">);</span>
+<span class="nv">$job</span><span class="o">-&gt;</span><span class="na">onMinute</span><span class="p">(</span><span class="s1">'35-40'</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">doJob</span><span class="p">(</span><span class="s2">"echo bar"</span><span class="p">);</span>
+<span class="nv">$crontab</span><span class="o">-&gt;</span><span class="na">add</span><span class="p">(</span><span class="nv">$job</span><span class="p">);</span>
+<span class="nv">$crontab</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</pre>
+</div>
+
+
+<p>A more complex example, but simpler to write. Adding and removing files to 
+manage by the cron job. Files will be updated so as not to disrupt other tasks
+in the cron:</p>
+
+<div class="highlight">
+<pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">php\manager\crontab\CrontabManager</span><span class="p">;</span>
+
+<span class="nv">$crontab</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">CrontabManager</span><span class="p">();</span>
+<span class="nv">$crontab</span><span class="o">-&gt;</span><span class="na">enableOrUpdate</span><span class="p">(</span><span class="s1">'/tmp/my/crontab.txt'</span><span class="p">);</span>
+<span class="nv">$crontab</span><span class="o">-&gt;</span><span class="na">disable</span><span class="p">(</span><span class="s1">'/tmp/toremove.txt'</span><span class="p">);</span>
+<span class="nv">$crontab</span><span class="o">-&gt;</span><span class="na">save</span><span class="p">();</span>
+</pre>
+</div>
+
+
+<p>You can also use the built-in tools from the console: cronman located in the
+directory <code>bin/</code> for ex.:</p>
+
+<pre><code>bin/cronman --enable /var/www/myproject/.cronfile --user www-data
+</code></pre>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/MediovskiTechnology">MediovskiTechnology</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+    
+  </body>
+</html>
