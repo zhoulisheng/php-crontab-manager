@@ -543,7 +543,8 @@ class CrontabManager {
             if (is_array($oldJobs)) {
                 foreach ($oldJobs as $oldJob) {
                     if ($oldJob != '') {
-                        if (!preg_match('/' . $job . '/', $oldJob)) {
+                        $pattern = str_replace('/', '\/', $job);    //escape the '/' char
+                        if (!preg_match('/' . $pattern . '/', $oldJob)) {
                             $newJob = new CronEntry($oldJob, $this);
                             $newJob->lineComment = '';
                             $data[] = $newJob;
@@ -577,7 +578,8 @@ class CrontabManager {
             if (is_array($jobs)) {
                 foreach ($jobs as $oneJob) {
                     if ($oneJob != '') {
-                        if (preg_match('/' . $job . '/', $oneJob)) {
+                        $pattern = str_replace('/', '\/', $job);    //escape the '/' char
+                        if (preg_match('/' . $pattern . '/', $oneJob)) {
                            return true;
                         }
                     }
